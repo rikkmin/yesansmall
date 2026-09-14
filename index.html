@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>예산 계산기</title>
+    <meta name="description" content="여비, 사례비, 업무추진비 계산기">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app">
+      <header class="masthead">
+        <div>
+          <p class="eyebrow">KPF Budget Calculator</p>
+          <h1>예산 계산기</h1>
+        </div>
+        <nav class="tabs" aria-label="계산기 선택">
+          <button class="tab active" type="button" data-panel="travel">여비</button>
+          <button class="tab" type="button" data-panel="honorarium">사례비</button>
+          <button class="tab" type="button" data-panel="business">업무추진비</button>
+        </nav>
+      </header>
+
+      <section class="workspace">
+        <form class="panel active" id="travel" data-calculator="travel">
+          <div class="panel-head">
+            <p class="eyebrow">Travel</p>
+            <h2>여비 계산</h2>
+          </div>
+          <div class="fields two">
+            <label>출장구분
+              <select id="travelType">
+                <option value="domestic">국내출장</option>
+                <option value="overseas">국외출장</option>
+                <option value="local">근무지내 국내출장</option>
+                <option value="regular">상시출장</option>
+              </select>
+            </label>
+            <label>직급
+              <select id="travelGrade">
+                <option value="chair">이사장</option>
+                <option value="executive">임원</option>
+                <option value="director">실·국·센터장</option>
+                <option value="manager">팀장·지소장</option>
+                <option value="staff">직원</option>
+              </select>
+            </label>
+            <label>국외 지역등급
+              <select id="overseasRegion">
+                <option value="a">가등급</option>
+                <option value="b">나등급</option>
+                <option value="c">다등급</option>
+                <option value="d">라등급</option>
+              </select>
+            </label>
+            <label>환율 기준
+              <input id="exchangeRate" type="number" min="0" step="0.01" value="1350">
+            </label>
+            <label>출장일수
+              <input id="travelDays" type="number" min="1" step="1" value="1">
+            </label>
+            <label>숙박일수
+              <input id="travelNights" type="number" min="0" step="1" value="0">
+            </label>
+            <label>출장시간
+              <input id="travelHours" type="number" min="0" step="0.5" value="4">
+            </label>
+            <label>실제 숙박비(국내 원 / 국외 USD)
+              <input id="lodgingActual" type="number" min="0" step="1000" value="0">
+            </label>
+            <label>차감 식수
+              <input id="deductedMeals" type="number" min="0" step="1" value="0">
+            </label>
+          </div>
+          <label class="check">
+            <input id="providedTransport" type="checkbox">
+            재단 교통편 제공
+          </label>
+        </form>
+
+        <form class="panel" id="honorarium" data-calculator="honorarium">
+          <div class="panel-head">
+            <p class="eyebrow">Honorarium</p>
+            <h2>사례비 계산</h2>
+          </div>
+          <div class="fields two">
+            <label>유형
+              <select id="honorariumType">
+                <option value="general">일반 강의료</option>
+                <option value="special">특별 강의료</option>
+                <option value="other">기타 강의료</option>
+                <option value="meeting">회의참가비</option>
+                <option value="writingA">일반원고 A</option>
+                <option value="writingB">일반원고 B</option>
+              </select>
+            </label>
+            <label>시간
+              <input id="honorariumHours" type="number" min="0" step="0.5" value="2">
+            </label>
+            <label>원거리
+              <select id="distanceRate">
+                <option value="1">없음</option>
+                <option value="1.5">편도 40km~100km</option>
+                <option value="1.7">편도 100km 초과</option>
+                <option value="2">도서지역</option>
+                <option value="other_40_60">기타강의: 40km 이상 60km 미만</option>
+                <option value="other_60_100">기타강의: 60km 이상 100km 미만</option>
+                <option value="other_100_150">기타강의: 100km 이상 150km 미만</option>
+                <option value="other_150_200">기타강의: 150km 이상 200km 미만</option>
+                <option value="other_200_250">기타강의: 200km 이상 250km 미만</option>
+                <option value="other_250_300">기타강의: 250km 이상 300km 미만</option>
+                <option value="other_300">기타강의: 300km 이상</option>
+                <option value="island_ga">기타강의 도서·벽지: 가 지역</option>
+                <option value="island_na">기타강의 도서·벽지: 나 지역</option>
+                <option value="island_da">기타강의 도서·벽지: 다 지역</option>
+                <option value="island_ra">기타강의 도서·벽지: 라 지역</option>
+              </select>
+            </label>
+            <label>추가 지급 횟수
+              <input id="extraTripCount" type="number" min="1" max="2" step="1" value="1">
+            </label>
+            <label>원고 200자 단위
+              <input id="writingUnits" type="number" min="1" step="1" value="10">
+            </label>
+          </div>
+        </form>
+
+        <form class="panel" id="business" data-calculator="business">
+          <div class="panel-head">
+            <p class="eyebrow">Business</p>
+            <h2>업무추진비 계산</h2>
+          </div>
+          <div class="fields two">
+            <label>집행금액
+              <input id="businessAmount" type="number" min="0" step="1000" value="300000">
+            </label>
+            <label>참석인원
+              <input id="businessPeople" type="number" min="1" step="1" value="6">
+            </label>
+          </div>
+        </form>
+
+        <aside class="result">
+          <div class="result-head">
+            <p class="eyebrow">Result</p>
+            <h2 id="resultTitle">여비 계산</h2>
+          </div>
+          <div class="total">
+            <span>산출액</span>
+            <strong id="totalAmount">0원</strong>
+          </div>
+          <div id="cards" class="cards"></div>
+          <div class="basis">
+            <strong>근거</strong>
+            <p id="basisText"></p>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
