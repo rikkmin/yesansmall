@@ -104,6 +104,7 @@ function calculateTravel() {
   const actualLodging = number("lodgingActual");
   const deductedMeals = Math.max(0, number("deductedMeals"));
   const provided = $("providedTransport").checked;
+  const capIncrease = $("lodgingCapIncrease").checked;
 
   if (type === "local") {
     const amount = provided ? 10000 : hours >= 4 ? 20000 : 10000;
@@ -133,7 +134,8 @@ function calculateTravel() {
     const mealBaseUsd = rate.meal[region] * days;
     const mealDeductionUsd = Math.min(mealBaseUsd, (rate.meal[region] / 3) * deductedMeals);
     const mealUsd = Math.max(0, mealBaseUsd - mealDeductionUsd);
-    const lodgingCapUsd = rate.lodging[region] * nights;
+    const lodgingCapUnitUsd = rate.lodging[region] * (capIncrease ? 1.5 : 1);
+    const lodgingCapUsd = lodgingCapUnitUsd * nights;
     const lodgingUsd = nights > 0 ? Math.min(actualLodging, lodgingCapUsd) : 0;
     const totalUsd = dailyUsd + mealUsd + lodgingUsd;
     const total = totalUsd * exchangeRate;
@@ -143,9 +145,10 @@ function calculateTravel() {
       { label: "일비", value: `${usd(dailyUsd)} (${usd(rate.daily[region])} × ${days}일)` },
       { label: "식비", value: `${usd(mealUsd)} (차감 ${deductedMeals}식)` },
       { label: "숙박 반영액", value: nights > 0 ? `${usd(lodgingUsd)} / 상한 ${usd(lodgingCapUsd)}` : "해당 없음" },
+      { label: "숙박 상한", value: capIncrease ? "1.5배 증액 적용 · 이사장 승인 필요" : `${usd(rate.lodging[region])} / 1박` , tone: capIncrease ? "warn" : "" },
       { label: "환율", value: `${money.format(exchangeRate)}원 / USD` },
       { label: "국외 등급", value: `${rate.label}, ${$("overseasRegion").selectedOptions[0].textContent}` }
-    ], `${grade.basis}. 국외 여비 지급표의 일비·숙박비·식비는 미 달러화 기준이며, 식비 차감은 1식당 해당 1일 식비의 1/3로 계산했습니다.`);
+    ], `${grade.basis}. 국외 여비 지급표의 일비·숙박비·식비는 미 달러화 기준이며, 식비 차감은 1식당 해당 1일 식비의 1/3로 계산했습니다. 숙박비 상한 증액 적용 시 국외는 1.5배 상한으로 계산하며 이사장 승인이 필요합니다.`);
     return;
   }
 
@@ -153,19 +156,25 @@ function calculateTravel() {
   const mealDeduction = Math.min(mealBase, (grade.meal / 3) * deductedMeals);
   const mealAmount = Math.max(0, mealBase - mealDeduction);
   const dailyMeal = (grade.daily * days) + mealAmount;
-  const lodgingMax = grade.lodging.type === "actual" ? actualLodging : Math.min(actualLodging, grade.lodging.other * nights);
+  const domesticCapMultiplier = capIncrease ? 1.3 : 1;
+  const lodgingUnitCap = grade.lodging.type === "actual" ? null : grade.lodging.other * domesticCapMultiplier;
+  const lodgingMax = grade.lodging.type === "actual" ? actualLodging : Math.min(actualLodging, lodgingUnitCap * nights);
   const lodgingLabel = grade.lodging.type === "actual"
     ? "실비"
-    : `상한: 서울 ${won(grade.lodging.seoul)} / 광역시 ${won(grade.lodging.metro)} / 기타 ${won(grade.lodging.other)}`;
+    : `상한: 서울 ${won(grade.lodging.seoul * domesticCapMultiplier)} / 광역시 ${won(grade.lodging.metro * domesticCapMultiplier)} / 기타 ${won(grade.lodging.other * domesticCapMultiplier)}`;
   const total = dailyMeal + lodgingMax;
 
-  setResult("여비 계산", total, [
+  const cards = [
     { label: "일비", value: won(grade.daily * days) },
     { label: "식비", value: `${won(mealAmount)} (차감 ${deductedMeals}식)` },
     { label: "숙박 반영액", value: nights > 0 ? won(lodgingMax) : "해당 없음" },
     { label: "숙박 기준", value: lodgingLabel },
     { label: "운임", value: grade.transport }
-  ], `${grade.basis}. 운임과 숙박비는 증빙 및 정산 기준 확인 필요. 식비 차감은 1식당 해당 1일 식비의 1/3로 계산했습니다.`);
+  ];
+  if (capIncrease && grade.lodging.type !== "actual") {
+    cards.push({ label: "숙박 상한 증액", value: "1.3배 적용 · 이사장 승인 필요", tone: "warn" });
+  }
+  setResult("여비 계산", total, cards, `${grade.basis}. 운임과 숙박비는 증빙 및 정산 기준 확인 필요. 식비 차감은 1식당 해당 1일 식비의 1/3로 계산했습니다. 숙박비 상한 증액 적용 시 국내는 1.3배 상한으로 계산하며 이사장 승인이 필요합니다.`);
 }
 
 function lectureBase(kind, hours) {
