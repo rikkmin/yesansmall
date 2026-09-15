@@ -20,24 +20,6 @@ const travelGrades = {
     transport: "실비",
     basis: "여비규정 별표1 및 별표2: 임원은 국외여비 공무원 여비규정 별표1 제1호라목 기준"
   },
-  director: {
-    label: "실·국·센터장",
-    daily: 25000,
-    meal: 25000,
-    lodging: { type: "actual" },
-    overseasBand: "class2",
-    transport: "실비",
-    basis: "여비규정 별표1 비고 4, 공무원 여비 업무 처리기준: 실·국장급은 제1호 숙박비 실비 기준"
-  },
-  manager: {
-    label: "팀장·지소장",
-    daily: 25000,
-    meal: 25000,
-    lodging: { type: "cap", seoul: 100000, metro: 80000, other: 70000 },
-    overseasBand: "class2",
-    transport: "실비",
-    basis: "여비규정 별표1 비고 4, 공무원 여비 업무 처리기준 국내 여비 지급표 제2호"
-  },
   staff: {
     label: "직원",
     daily: 25000,
@@ -272,4 +254,5 @@ document.querySelectorAll("input, select").forEach((field) => field.addEventList
 document.querySelectorAll("select").forEach((field) => field.addEventListener("change", calculate));
 
 calculate();
+
 
