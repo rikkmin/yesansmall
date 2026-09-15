@@ -124,12 +124,12 @@ function calculateTravel() {
   const provided = $("providedTransport").checked;
 
   if (type === "local") {
-    const amount = provided ? 0 : hours >= 4 ? 20000 : 10000;
+    const amount = provided ? 10000 : hours >= 4 ? 20000 : 10000;
     setResult("여비 계산", amount, [
       { label: "근무지내 지급액", value: won(amount) },
       { label: "시간 기준", value: hours >= 4 ? "4시간 이상" : "4시간 미만" },
       { label: "교통편 제공", value: provided ? "예" : "아니오", tone: provided ? "warn" : "" }
-    ], "여비규정 제14조의1: 근무지 내 국내출장은 4시간 이상 최대 20,000원, 4시간 미만 최대 10,000원. 재단 교통편 제공 시 미지급.");
+    ], "여비규정 제14조의1: 근무지 내 국내출장은 4시간 이상 최대 20,000원, 4시간 미만 최대 10,000원. 재단 교통편 제공 시 10,000원 지급.");
     return;
   }
 
@@ -272,3 +272,4 @@ document.querySelectorAll("input, select").forEach((field) => field.addEventList
 document.querySelectorAll("select").forEach((field) => field.addEventListener("change", calculate));
 
 calculate();
+
